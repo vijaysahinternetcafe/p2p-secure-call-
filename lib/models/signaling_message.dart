@@ -1,8 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'signaling_message.g.dart';
-
-@JsonSerializable()
 class SignalingMessage {
   final String type;
   final String? callId;
@@ -26,8 +21,31 @@ class SignalingMessage {
     this.timestamp,
   });
 
-  factory SignalingMessage.fromJson(Map<String, dynamic> json) =>
-      _\$SignalingMessageFromJson(json);
+  factory SignalingMessage.fromJson(Map<String, dynamic> json) {
+    return SignalingMessage(
+      type: json['type'] ?? '',
+      callId: json['callId'],
+      from: json['from'],
+      to: json['to'],
+      sdp: json['sdp'],
+      candidate: json['candidate'],
+      sdpMid: json['sdpMid'],
+      sdpMLineIndex: json['sdpMLineIndex'],
+      timestamp: json['timestamp'],
+    );
+  }
 
-  Map<String, dynamic> toJson() => _\$SignalingMessageToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      if (callId != null) 'callId': callId,
+      if (from != null) 'from': from,
+      if (to != null) 'to': to,
+      if (sdp != null) 'sdp': sdp,
+      if (candidate != null) 'candidate': candidate,
+      if (sdpMid != null) 'sdpMid': sdpMid,
+      if (sdpMLineIndex != null) 'sdpMLineIndex': sdpMLineIndex,
+      if (timestamp != null) 'timestamp': timestamp,
+    };
+  }
 }
