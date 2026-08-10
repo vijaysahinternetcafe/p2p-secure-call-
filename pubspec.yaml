@@ -1,1 +1,52 @@
+name: p2p_secure_call
+description: Production-grade P2P calling app with WebRTC
+publish_to: 'none'
+version: 1.0.0+1
 
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # WebRTC
+  flutter_webrtc: ^0.9.48
+
+  # Signaling
+  web_socket_channel: ^2.4.5
+
+  # Crypto (Ed25519)
+  cryptography: ^2.7.0
+
+  # Secure Storage (KeyStore/Keychain)
+  flutter_secure_storage: ^9.2.2
+
+  # Notifications
+  flutter_local_notifications: ^17.2.3
+  flutter_callkit_incoming: ^2.0.4
+
+  # Foreground Service
+  flutter_foreground_task: ^6.5.0
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # Utilities
+  uuid: ^4.5.1
+  wakelock_plus: ^1.2.8
+  json_annotation: ^4.9.0
+
+  # State Management
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true
