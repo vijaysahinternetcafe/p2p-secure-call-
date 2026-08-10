@@ -1,1 +1,53 @@
+name: Build APK Automatically
 
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: P2P-Secure-Call-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+          tag_name: v1.0.${{ github.run_number }}
+          name: "P2P Secure Call v1.0.${{ github.run_number }}"
+          body: |
+            ## P2P Secure Call APK
+
+            ### इंस्टॉल करने का तरीका:
+            1. `app-release.apk` डाउनलोड करो
+            2. फोन में इंस्टॉल करो (अननोन सोर्सेज ऑन करो)
+            3. दोनों फोन में ऐप खोलो
+            4. डिवाइस आईडी नोट करो
+            5. कॉल करो!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
