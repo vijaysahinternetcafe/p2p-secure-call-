@@ -21,30 +21,23 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
       
-      - name: Create Flutter Project Structure
+      - name: Create Flutter Project
         run: |
-          # Create a fresh Flutter project
           flutter create temp_project --project-name p2p_secure_call
-          
-          # Remove default lib folder
           rm -rf temp_project/lib/*
-          
-          # Copy our custom files to temp project
           cp -r lib/* temp_project/lib/ 2>/dev/null || true
           cp pubspec.yaml temp_project/pubspec.yaml
-          
-          # Copy Android files
           cp -r android/* temp_project/android/ 2>/dev/null || true
-          
-          # Copy iOS files  
           cp -r ios/* temp_project/ios/ 2>/dev/null || true
-          
-          # Move temp project to root
-          rm -rf lib android ios pubspec.yaml README.md
+          rm -rf lib android ios pubspec.yaml
           mv temp_project/* .
           mv temp_project/.* . 2>/dev/null || true
           rm -rf temp_project
-      
+          
+      - name: Fix Android SDK
+        run: |
+          echo "sdk.dir=/usr/local/lib/android/sdk" > android/local.properties
+          
       - name: Get Dependencies
         run: flutter pub get
       
@@ -64,15 +57,5 @@ jobs:
           files: build/app/outputs/flutter-apk/app-release.apk
           tag_name: v1.0.${{ github.run_number }}
           name: "P2P Secure Call v1.0.${{ github.run_number }}"
-          body: |
-            ## P2P Secure Call APK
-            
-            ### इंस्टॉल करने का तरीका:
-            1. `app-release.apk` डाउनलोड करो
-            2. फोन में इंस्टॉल करो (अननोन सोर्सेज ऑन करो)
-            3. दोनों फोन में ऐप खोलो
-            4. डिवाइस आईडी नोट करो
-            5. कॉल करो!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
