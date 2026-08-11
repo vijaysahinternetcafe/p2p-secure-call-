@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -21,38 +21,51 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
       
-      - name: Create Flutter Project
+      - name: Create Fresh Flutter Project
         run: |
-          flutter create temp_project --project-name p2p_secure_call
+          flutter create temp_project --project-name p2p_secure_call --platforms android
           rm -rf temp_project/lib/*
-          cp -r lib/* temp_project/lib/ 2>/dev/null || true
+          cp -r lib/* temp_project/lib/
           cp pubspec.yaml temp_project/pubspec.yaml
-          cp -r android/* temp_project/android/ 2>/dev/null || true
-          cp -r ios/* temp_project/ios/ 2>/dev/null || true
-          rm -rf lib android ios pubspec.yaml .github
-          mv temp_project/* .
-          mv temp_project/.* . 2>/dev/null || true
-          rm -rf temp_project
-          
-      - name: Fix Gradle Version
+      
+      - name: Inject Android Permissions
         run: |
-          mkdir -p android/gradle/wrapper
-          cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
-          distributionBase=GRADLE_USER_HOME
-          distributionPath=wrapper/dists
-          zipStoreBase=GRADLE_USER_HOME
-          zipStorePath=wrapper/dists
-          distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-all.zip
-          EOF
-          
+          MANIFEST="temp_project/android/app/src/main/AndroidManifest.xml"
+          sed -i 's|</manifest>|    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.BLUETOOTH" />\n    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-feature android:name="android.hardware.camera" android:required="true" />\n    <uses-feature android:name="android.hardware.microphone" android:required="true" />\n</manifest>|' "$MANIFEST"
+          sed -i 's|android:theme="@style/LaunchTheme"|android:theme="@style/LaunchTheme"\n            android:showWhenLocked="true"\n            android:turnScreenOn="true"|' "$MANIFEST"
+      
       - name: Get Dependencies
-        run: flutter pub get
+        run: |
+          cd temp_project
+          flutter pub get
       
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          cd temp_project
+          flutter build apk --release
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: P2P-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: P2P-Secure-Call-APK
+          path: temp_project/build/app/outputs/flutter-apk/app-release.apk
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          files: temp_project/build/app/outputs/flutter-apk/app-release.apk
+          tag_name: v1.0.${{ github.run_number }}
+          name: "P2P Secure Call v1.0.${{ github.run_number }}"
+          body: |
+            ## P2P Secure Call APK
+            
+            Install this APK on both phones and start calling!
+            
+            ### Steps:
+            1. Download `app-release.apk`
+            2. Install on Phone A and Phone B
+            3. Open app, note Device IDs
+            4. Enter other phone ID and call!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
