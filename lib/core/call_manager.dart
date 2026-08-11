@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../services/permission_service.dart';
 import 'crypto_manager.dart';
@@ -141,7 +140,6 @@ class CallManager extends ChangeNotifier {
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     });
 
-    await WakelockPlus.enable();
     _updateState(CallState.ringing);
   }
 
@@ -166,7 +164,6 @@ class CallManager extends ChangeNotifier {
       'sdp': answer.sdp,
     });
 
-    await WakelockPlus.enable();
     _updateState(CallState.connected);
   }
 
@@ -284,7 +281,6 @@ class CallManager extends ChangeNotifier {
 
   Future<void> _cleanup() async {
     _updateState(CallState.idle);
-    await WakelockPlus.disable();
     for (final track in _localStream?.getTracks() ?? []) {
       track.stop();
     }
