@@ -16,8 +16,8 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   permission_handler: ^11.3.1
   uuid: ^4.5.1
-  wakelock_plus: ^1.2.8
   provider: ^6.1.2
+  # wakelock_plus REMOVED - causing package_info_plus Gradle conflict
 
 dev_dependencies:
   flutter_test:
@@ -26,4 +26,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
