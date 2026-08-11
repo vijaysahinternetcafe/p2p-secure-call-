@@ -1,5 +1,5 @@
 name: p2p_secure_call
-description: P2P Secure Call App
+description: P2P Secure Video Call App
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -26,3 +26,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
